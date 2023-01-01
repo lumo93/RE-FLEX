@@ -40,4 +40,4 @@ Check_Logs:
 
 This will let you know if everything is working.
 
-Yagmail uses gmail with app password, so you will need to set that up for notifications via email
+Yagmail uses gmail with app password, so you will need to set that up for notifications via email, it's disabled by default
