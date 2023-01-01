@@ -1,0 +1,42 @@
+station_list = {
+    'fd409ef8-f297-4543-9b93-6a5e93184313': {
+        'headstart': 1,
+        'lowprice': 125,
+        'mainlength': 3.5,
+        'mainrate': 26,
+        'sublength': 3,
+        'subrate': 27,
+    },
+    '8c81c54f-6a60-405c-b095-43d9b9bc99c2': {
+        'headstart': 2,
+        'lowprice': 120,
+        'mainlength': 4,
+        'mainrate': 25,
+        'sublength': 3.5,
+        'subrate': 27,
+    },
+    'ffbac4b5-8850-48e8-86bd-4403685d46d7': {
+        'headstart': 0.7,
+        'lowprice': 110,
+        'mainlength': 4,
+        'mainrate': 23,
+        'sublength': 3.5,
+        'subrate': 24,
+    },
+    'a5e1a8d5-c368-4cb8-a2c6-3b71b3eb8178': {
+        'headstart': 1,
+        'lowprice': 115,
+        'mainlength': 4,
+        'mainrate': 25,
+        'sublength': 3.5,
+        'subrate': 26,
+    },
+    'f78af44a-613a-4cea-bfd4-7ad17da2719d': {
+        'headstart': 1,
+        'lowprice': 120,
+        'mainlength': 3.5,
+        'mainrate': 25,
+        'sublength': 3,
+        'subrate': 26,
+    },
+}
