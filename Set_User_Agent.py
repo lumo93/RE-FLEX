@@ -3,7 +3,7 @@ import random
 import os
 
 if not os.path.exists("userdata/version"):
-    print("Please set your version first!")
+    print("Please Set_Version first!")
     exit()
 
 def select_from_list():
