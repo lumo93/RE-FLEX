@@ -14,13 +14,13 @@ Everything is done from Script_Dock.py
 
 First time setup:
 
-Set_User_Agent:
-
-Select from the list and click set, or click random. Once set, this button will not be here in the future when running script dock to prevent different user agent devices.
-
 Set_Version:
 
 Just put the app version here and click save
+
+Set_User_Agent:
+
+Select from the list and click set, or click random. Once set, this button will not be here in the future when running script dock to prevent different user agent devices.
 
 Start Main:
 
