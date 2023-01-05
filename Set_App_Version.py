@@ -13,7 +13,7 @@ def save_string():
 # Create the main window
 window = tk.Tk()
 
-label = tk.Label(window, text='Set Version:')
+label = tk.Label(window, text='Set current Android Flex app Version:')
 label.pack()
 
 file_contents = None
