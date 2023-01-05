@@ -6,11 +6,11 @@ import authCycle, getServiceAreas
 import os
 
 if not os.path.exists("userdata/version"):
-    print("Please set your version and useragent first!")
+    print("Please set the current Android Flex app version!\nFollowed by the useragent!")
     exit()
 
 if not os.path.exists("userdata/useragent"):
-    print("Please set your useragent first!")
+    print("Please set your useragent!")
     exit()
 
 def load_data(filepath):
@@ -30,7 +30,7 @@ except:
     getServiceAreas.getAllServiceAreas()
     stationlist = load_data('userdata/serviceAreaIds')
 
-import filters, live_updates, debug#, yagmail_alert
+import filters, live_updates, yagmail_alert, debug
 
 keys = []
 
@@ -62,6 +62,9 @@ rapidtimehigh = 0.3
 rapidtimelow = 0.2
 
 rapidrefresh = rapidvalue
+
+#In Minutes
+ratelimitsleep = 30
 
 logging.basicConfig(format="%(asctime)s \n\t%(message)s", datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 
@@ -148,7 +151,7 @@ def accept_block(block):
     if accept.status_code == 200:
         logging.info(f"Caught The Block For {block['rateInfo']['priceAmount']}")
         debug.caught_print(block)
-        #yagmail_alert.email_alert(block)
+        yagmail_alert.email_alert(block)
     else:
         logging.info(f"Missed The Block For {block['rateInfo']['priceAmount']}")
         debug.missed_print(block)
@@ -171,7 +174,7 @@ if __name__ == "__main__":
                 authCycle.authCycle()
             if lst == "Rate exceeded":
                 logging.info("Rate Exceeded, Waiting")
-                time.sleep(30)
+                time.sleep(ratelimitsleep*60)
                 logging.info("Resuming operations")
             try:
                 if 200 in lst:
