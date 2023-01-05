@@ -1,10 +1,5 @@
 import tkinter as tk
 import random
-import os
-
-if not os.path.exists("userdata/version"):
-    print("Please Set_Version first!")
-    exit()
 
 def select_from_list():
     # Get the index of the currently selected item in the listbox
