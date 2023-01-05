@@ -55,5 +55,5 @@ def time_headstart(block):
     headstart = b['headstart']
     b_headstart = block["startTime"] - int(time.time())
     return(
-        b_headstart >= headstart*3600
+        b_headstart >= headstart*60
     )
