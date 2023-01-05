@@ -14,7 +14,7 @@ def generate_station_list(station_list, filepath):
     # Open the file in write mode
     with open(filepath, 'w') as f:
         f.write(f"# Default Values\n")
-        f.write(f"def_headstart = 1\n")
+        f.write(f"def_headstart = 60\n")
         f.write(f"def_rate = 25\n")
         f.write(f"def_maxlength = 5\n")
         f.write(f"def_lowprice = 120\n")
