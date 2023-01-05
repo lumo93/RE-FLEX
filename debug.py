@@ -30,31 +30,31 @@ def print_format(block, f):
 
 def scan_print(block):
     try:
-        with open ("scandata/recent-scans", "a") as f:
+        with open ("scandata/Offers_Outside_Filters", "a") as f:
             print_format(block, f)
     except KeyError:
         print('scan print glitch')
         
 def baserate_print(block):
     try:
-        with open ("scandata/baserate", "a") as f:
+        with open ("scandata/Baserate", "a") as f:
             print_format(block, f)
     except KeyError:
         print('baserate print glitch')
 
 def nheadstart_print(block):
     try:
-        with open ("scandata/nheadstart", "a") as f:
+        with open ("scandata/Starts_Too_Soon", "a") as f:
             print_format(block, f)
     except KeyError:
         print('nheadstart print glitch')
 
 def caught_print(block):
-        with open("scandata/scanned_blocks", "a") as f:
+        with open("scandata/Recent_Attempts", "a") as f:
             print('Caught Block for', round(block['rateInfo']['priceAmount'], 1), 'Dollars', file=f)
             print('----------------------------------')
 
 def missed_print(block):
-        with open("scandata/scanned_blocks", "a") as f:
+        with open("scandata/Recent_Attempts", "a") as f:
             print('Missed Block for', round(block['rateInfo']['priceAmount'], 1), 'Dollars', file=f)
             print('----------------------------------')

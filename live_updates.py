@@ -64,7 +64,7 @@ def print_history(block):
     block_price = block['rateInfo']['priceAmount']
     block_rate = block_price / block_length
     try:
-        with open('scandata/scanned_blocks', 'a') as f:
+        with open('scandata/Recent_Attempts', 'a') as f:
             print('----------------------------------', file=f)
             print('Scanned at', time.strftime('%m/%d/%Y %I:%M:%S %p'), file=f)
             print('----------------------------------', file=f)
@@ -79,7 +79,7 @@ def rapid_history(block):
     block_price = block['rateInfo']['priceAmount']
     block_rate = block_price / block_length
     try:
-        with open('scandata/scanned_blocks', 'a') as f:
+        with open('scandata/Recent_Attempts', 'a') as f:
             print('----------------------------------', file=f)
             print(date.fromtimestamp(block['startTime']).strftime('%A'), time.strftime('%m/%d/%Y %I:%M %p', time.localtime(block['startTime'])), file=f)
             try:
