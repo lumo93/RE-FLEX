@@ -38,6 +38,8 @@ Set_Filter_Values:
 
 Set your filters based on whatever criteria you desire, then click save. If you have many stations the filter list will scroll.
 
+Note: headstart is in minutes
+
 Once done, Start Main, and then,
 
 Check_Logs:
