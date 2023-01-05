@@ -9,14 +9,18 @@ pip install requests pyaes pbkdf2 yagmail
 Then press enter.
 
 .
+Disclaimer: This is spoofing the Android App, you should be able to use it still if you use iPhone, but when you set the version you are following the Android Version number
+.
+WARNING!: Never copy the userdata folder to another device. If you need to use a different device, have a fresh script with a blank userdata folder and do the sign in process on that device. The challenge link itself can be done anywhere as long as the maplanding is pasted into the script terminal
+.
 
 Everything is done from Script_Dock.py
 
 First time setup:
 
-Set_Version:
+Set_App_Version:
 
-Just put the app version here and click save
+Just put the Android Flex app version here and click save
 
 Set_User_Agent:
 
