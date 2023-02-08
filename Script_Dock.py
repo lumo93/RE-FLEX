@@ -107,9 +107,9 @@ for script in scripts:
 
 if not os.path.exists("userdata/useragent"):
 
-    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "Set_User_Agent", "delete_access_token"]
+    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "Set_Speeds_and_Behavior", "Set_User_Agent", "delete_access_token"]
 else:
-    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "delete_access_token"]
+    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "Set_Speeds_and_Behavior", "delete_access_token"]
 
 for script in scriptsn:
     app.add_script(script, has_stop_button=False)

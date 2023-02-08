@@ -52,19 +52,24 @@ header_data.headers['User-Agent'] = f"'{ua} RabbitAndroid/{ver}'"
 # update the value of serviceAreaFilter in search_json_data
 json_data.search_json_data["filters"]["serviceAreaFilter"] = keys
 
+try:
+    import userdata.speed_behavior_values as sbv
+except:
+    print("Please set your speeds and rate limit sleep")
+    exit()
 
-timehigh = 4.2
-timelow = 3.8
+timehigh = sbv.timehigh
+timelow = sbv.timelow
 
-rapidvalue = 3
+rapidvalue = sbv.rapidvalue
 
-rapidtimehigh = 0.3
-rapidtimelow = 0.2
+rapidtimehigh = sbv.rapidtimehigh
+rapidtimelow = sbv.rapidtimelow
 
 rapidrefresh = rapidvalue
 
 #In Minutes
-ratelimitsleep = 30
+ratelimitsleep = sbv.ratelimitsleep
 
 logging.basicConfig(format="%(asctime)s \n\t%(message)s", datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 
@@ -84,15 +89,12 @@ def get_offer_list():
     offer_accepted = False
     try:
         for block in j["offerList"]:
-            if(rapidrefresh>=rapidvalue):
-                l_mode(block)
-            if(rapidrefresh<rapidvalue):
-                l_rapid(block)
             if block['serviceAreaId'] in filters.station_list and filters.time_headstart(block) and filters.advanced_filter(block) and not block["hidden"] and not offer_accepted:
                 status = accept_block(block)
                 if status == 200:
                     offer_accepted = True
                     break
+            live_update_code(block)
     except KeyError:
         try:
             return j["message"]
@@ -101,31 +103,25 @@ def get_offer_list():
             raise
     return [200] if offer_accepted else []
 
+def live_update_code(block):
+    if(rapidrefresh>=rapidvalue):
+        l_mode(block)
+    if(rapidrefresh<rapidvalue):
+        pass
+
 def l_mode(block):
     b_length = (block["endTime"] - block["startTime"]) / 3600
     b_price = block["rateInfo"]["priceAmount"]
     b_rate = b_price / b_length
     if block['serviceAreaId'] in filters.station_list:
-        if filters.time_headstart(block) and filters.advanced_filter(block) and not block["hidden"]:
-            live_updates.live_mode(block)
-            live_updates.print_history(block)
         if filters.time_headstart(block) and not filters.advanced_filter(block) and b_rate > 18 and not block["hidden"]:
             debug.scan_print(block)
         if filters.advanced_filter(block) and not filters.time_headstart(block) and not block["hidden"]:
             debug.nheadstart_print(block)
     if block['serviceAreaId'] not in filters.station_list:
         if b_rate > 18:
-            debug.scan_print(block)
+            debug.baserate_print(block)
     lm_base(block)
-
-def l_mode_lite(block):
-    b_length = (block["endTime"] - block["startTime"]) / 3600
-    b_price = block["rateInfo"]["priceAmount"]
-    b_rate = b_price / b_length
-    if block['serviceAreaId'] in filters.station_list:
-        if filters.time_headstart(block) and filters.advanced_filter(block) and not block["hidden"]:
-            live_updates.live_mode(block)
-            live_updates.print_history(block)
     
 def l_rapid(block):
     if block['serviceAreaId'] in filters.station_list:
@@ -149,10 +145,18 @@ def accept_block(block):
     )
 
     if accept.status_code == 200:
+        live_updates.live_mode(block)
+        live_updates.print_history(block)
         logging.info(f"Caught The Block For {block['rateInfo']['priceAmount']}")
         debug.caught_print(block)
         yagmail_alert.email_alert(block)
     else:
+        if(rapidrefresh>=rapidvalue):
+            live_updates.live_mode(block)
+            live_updates.print_history(block)
+        if(rapidrefresh<rapidvalue):
+            live_updates.live_rapid(block)
+            live_updates.rapid_history(block)
         logging.info(f"Missed The Block For {block['rateInfo']['priceAmount']}")
         debug.missed_print(block)
         rapidrefresh = 0
@@ -176,6 +180,8 @@ if __name__ == "__main__":
                 logging.info("Rate Exceeded, Waiting")
                 time.sleep(ratelimitsleep*60)
                 logging.info("Resuming operations")
+                authCycle.request_print()
+                authCycle.header_refresh()
             try:
                 if 200 in lst:
                     keepItUp = False
