@@ -1,6 +1,5 @@
 KNOWN ISSUE: Currently, if you click "Stop Main" while there is a rate sleep, the rate sleep will restart unless you close out Script Dock entirely. If you stop during normal operation there are no issues.
 
-Oversight: MAXLENGTH is actually MINLENGTH (Minimum instead of maximum) Will fix soon
 
 # RE-FLEX
 
