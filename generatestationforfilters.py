@@ -17,6 +17,7 @@ def generate_station_list(station_list, filepath):
         f.write(f"def_headstart = 60\n")
         f.write(f"def_rate = 25\n")
         f.write(f"def_minlength = 1\n")
+        f.write(f"def_maxlength = 5\n")
         f.write(f"def_lowprice = 120\n")
         f.write("\n")
         for station_id, station_name in station_list.items():
@@ -26,6 +27,7 @@ def generate_station_list(station_list, filepath):
             f.write(f"{station_name}_headstart = def_headstart\n")
             f.write(f"{station_name}_rate = def_rate\n")
             f.write(f"{station_name}_minlength = def_minlength\n")
+            f.write(f"{station_name}_maxlength = def_maxlength\n")
             f.write(f"{station_name}_lowprice = def_lowprice\n")
             # Write the opening line of the output to the file
         f.write("\n")
@@ -34,10 +36,11 @@ def generate_station_list(station_list, filepath):
         # Iterate over the station IDs and letters
         for station_id, letter in zip(station_ids, letters):
             # Construct the dictionary for the current station and write it to the file
-            f.write("    '{}': {{'headstart': {}, 'minlength': {}, 'rate': {}, 'lowprice': {}}},\n".format(
+            f.write("    '{}': {{'headstart': {}, 'minlength': {}, 'maxlength': {}, 'rate': {}, 'lowprice': {}}},\n".format(
                 station_id,
                 f"{letter}_headstart",
                 f"{letter}_minlength",
+                f"{letter}_maxlength",
                 f"{letter}_rate",
                 f"{letter}_lowprice"
             ))

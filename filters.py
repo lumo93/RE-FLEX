@@ -36,12 +36,13 @@ def advanced_filter(block):
     b = station_list[block['serviceAreaId']]
     lowprice = b['lowprice']
     minlength = b['minlength']
+    maxlength = b['maxlength']
     rate = b['rate']
     b_length = (block["endTime"] - block["startTime"]) / 3600
     b_price = block["rateInfo"]["priceAmount"]
     b_rate = b_price / b_length
     if b_price < lowprice:
-        if b_length >= minlength:
+        if maxlength >= b_length >= minlength:
             return (
                 b_rate >= rate
             )
