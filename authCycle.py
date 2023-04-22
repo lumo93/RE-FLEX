@@ -6,6 +6,7 @@ import uuid
 from uuid import UUID
 import registerCycle
 import register
+import os
 
 
 refresh_token = registerCycle.rCycle()
@@ -37,13 +38,33 @@ def test():
     else:
         pass
 
+def file_age_in_seconds(pathname):
+    """
+    Return the age of the file at pathname in seconds.
+    """
+    return time.time() - os.stat(pathname).st_mtime
+
+def check_header_file():
+    header_file = "userdata/access_token"
+    if os.path.exists(header_file):
+        age_in_seconds = file_age_in_seconds(header_file)
+        if age_in_seconds > (59 * 60) + 50:
+            print("Token is older than an hour")
+            request_print()
+            header_refresh()
+        else:
+            current_header()
+            test()
+    else:
+        print("Creating new token")
+        raise
+
 
 def authCycle():
     try:
         print('Reading from file ...', end='\r')
         time.sleep(1)
-        current_header()
-        test()
+        check_header_file()
     except:
         try:
             request_print()
