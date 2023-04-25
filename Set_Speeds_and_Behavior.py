@@ -87,7 +87,7 @@ else:
     rapidvalue_label.grid(row=2, column=0)
 
     rapidvalue_entry = tk.Entry(root)
-    rapidvalue_entry.insert(0, "150")
+    rapidvalue_entry.insert(0, "1")
     rapidvalue_entry.grid(row=2, column=1)
 
     rapidtimehigh_label = tk.Label(root, text="rapidtimehigh")
