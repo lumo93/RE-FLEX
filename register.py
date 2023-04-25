@@ -4,45 +4,83 @@ pyaes==1.6.1
 requests==2.28.1
 """
 
+
+import uuid
 import pyaes
 from pbkdf2 import PBKDF2
 import requests
 import secrets
-from urllib.parse import unquote, urlparse, parse_qs
+from urllib.parse import unquote, urlparse, parse_qs, urlencode
 import base64
 import hashlib
 import hmac
 import gzip
 import json
 
+with open('userdata/useragent', 'r') as u:
+    ua = u.read()
+
 APP_NAME = "com.amazon.rabbit"
 APP_VERSION = "303338310"
 DEVICE_NAME = "Le X522"
 MANUFACTURER = "LeMobile"
 OS_VERSION = "LeEco/Le2_NA/le_s2_na:6.0.1/IFXNAOP5801910272S/61:user/release-keys"
+USER_AGENT = ua
+
+DEVICE_TYPE = "A1MPSLFC7L5AFK" # or any other device type
+"""You need to save the following 3 variables somewhere on init"""
+device_serial = uuid.uuid4().hex.upper()
+device_id = secrets.token_hex(8)
+code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b'=').decode()
+
+device_type = "#" + DEVICE_TYPE
+client_id = (device_serial.encode() + device_type.encode()).hex()
+code_challenge = base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest()).rstrip(b'=')
+oauth_params = {
+    "openid.oa2.response_type": "code",
+    "openid.oa2.code_challenge_method": "S256",
+    "openid.oa2.code_challenge": code_challenge,
+    "openid.return_to": "https://www.amazon.com/ap/maplanding",
+    "openid.assoc_handle": "amzn_device_na",
+    "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
+    "pageId": "amzn_device_na",
+    "accountStatusPolicy": "P1",
+    "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
+    "openid.mode": "checkid_setup",
+    "openid.ns.oa2": "http://www.amazon.com/ap/ext/oauth/2",
+    "openid.oa2.client_id": f"device:{client_id}",
+    "openid.ns.pape": "http://specs.openid.net/extensions/pape/1.0",
+    "openid.ns": "http://specs.openid.net/auth/2.0",
+    "openid.pape.max_auth_age": "0",
+    "openid.oa2.scope": "device_auth_access",
+    "forceCaptcha": "true",
+    "use_global_authentication": "false"
+}
+challenge_link = f"https://www.amazon.com/ap/signin?{urlencode(oauth_params)}"
 
 
 def register_account(maplanding_url):
     parsed_query = parse_qs(urlparse(maplanding_url).query)
-    reg_access_token = unquote(parsed_query['openid.oa2.access_token'][0])
-    amz_account_id = unquote(parsed_query['openid.identity'][0]).replace(
-        'https://www.amazon.com/ap/id/', '')
-    #print(reg_access_token)
-    #print(amz_account_id)
-    device_id = secrets.token_hex(16)
+    authorization_code = unquote(parsed_query['openid.oa2.authorization_code'][0])
+    device_type = "#" + DEVICE_TYPE
+    client_id = (device_serial.encode() + device_type.encode()).hex()
     amazon_reg_data = {
         "auth_data": {
-            "access_token": reg_access_token
+            "client_id": client_id,
+            "authorization_code": authorization_code,
+            "code_verifier": code_verifier,
+            "code_algorithm": "SHA-256",
+            "client_domain": "DeviceLegacy"
         },
         "cookies": {
             "domain": ".amazon.com",
             "website_cookies": []
         },
         "device_metadata": {
-            "android_id": "52aee8aecab31ee3",
+            "android_id": device_id,
             "device_os_family": "android",
-            "device_serial": device_id,
-            "device_type": "A1MPSLFC7L5AFK",
+            "device_serial": device_serial,
+            "device_type": DEVICE_TYPE,
             "mac_address": secrets.token_hex(64).upper(),
             "manufacturer": MANUFACTURER,
             "model": DEVICE_NAME,
@@ -54,7 +92,7 @@ def register_account(maplanding_url):
             "app_version": APP_VERSION,
             "device_model": DEVICE_NAME,
             "device_serial": device_id,
-            "device_type": "A1MPSLFC7L5AFK",
+            "device_type": DEVICE_TYPE,
             "domain": "Device",
             "os_version": OS_VERSION,
             "software_version": "130050002"
@@ -75,23 +113,27 @@ def register_account(maplanding_url):
     }
 
     url = 'https://api.amazon.com/auth/register'
-    reg_headers = {"Content-Type": "application/json",
-                   "Accept-Charset": "utf-8",
-                   "x-amzn-identity-auth-domain": "api.amazon.com",
-                   "Connection": "keep-alive",
-                   "Accept": "*/*",
-                   "Accept-Language": "en-US"
-                   }
+    reg_headers = {
+                    "User-Agent": USER_AGENT,
+                    "Content-Type": "application/json",
+                    "Accept-Charset": "utf-8",
+                    "x-amzn-identity-auth-domain": "api.amazon.com",
+                    "Connection": "keep-alive",
+                    "Accept": "/",
+                    "Accept-Language": "en-US"
+    }
     res = requests.post(url, json=amazon_reg_data, headers=reg_headers, verify=True)
     if res.status_code != 200:
         print("login failed")
         return({"result": "failure"})
+    
 
     res = res.json()
     #print(res)
     tokens = res['response']['success']['tokens']['bearer']
     x_amz_access_token = tokens['access_token']
     refresh_token = tokens['refresh_token']
+    amz_account_id = res['response']['success']['extensions']['customer_info']['user_id']
     data = {
         "result":"success",
         "access_token": x_amz_access_token,
@@ -99,8 +141,8 @@ def register_account(maplanding_url):
         "amz_account_id": amz_account_id
         }
     #print(data)
-    with open('userdata/register_data', 'w') as d:
-        print(reg_access_token, '\n', amz_account_id, '\n', data, '\n', res, file=d)
+    #with open('userdata/register_data', 'w') as d:
+        #print(reg_access_token, '\n', amz_account_id, '\n', data, '\n', res, file=d)
     return(data["refresh_token"])
 
 def generate_frc(device_id):

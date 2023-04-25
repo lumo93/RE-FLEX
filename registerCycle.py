@@ -11,7 +11,7 @@ def rCycle():
             rt = r.read()
             return(rt)
     except:
-        challengelinkstatic = load_data("challengelinkstatic")
+        challengelinkstatic = register.challenge_link
         print(challengelinkstatic)
         maplanding_url = input('Enter result URL from doing Challenge Link:')
         refresh_token = register.register_account(maplanding_url)
