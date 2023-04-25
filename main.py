@@ -13,6 +13,10 @@ if not os.path.exists("userdata/useragent"):
     print("Please set your useragent!")
     exit()
 
+if not os.path.exists("userdata/speed_behavior_values.py"):
+    print("Please set your Speeds and Behavior settings!")
+    exit()
+
 def load_data(filepath):
     with open(filepath, 'r') as f:
         data = f.read()
