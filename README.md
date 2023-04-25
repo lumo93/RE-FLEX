@@ -2,7 +2,7 @@
 # RE-FLEX
 
 ## Download
-To download, click on the green 'code' button and 'download zip'.
+To download, click on the green 'code' button and 'download zip'. Be sure to extract the zip contents to it's own folder.
 
 ## Install
 
