@@ -4,6 +4,14 @@
 
 ## Install
 
+Install Python on Windows or Linux (should work on Mac but has not been tested)
+Supported Python versions:
+3.9
+3.10
+3.11
+
+You may or may not need to install 'pip' separately.
+
 Copy and paste the following command into terminal:
 `pip install requests pyaes pbkdf2 yagmail`
 
