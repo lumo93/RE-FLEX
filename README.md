@@ -33,6 +33,10 @@ Select the stations you want to work at, and click Generate List, you can close 
 **Set_Filter_Values:**
 Set your filters based on whatever criteria you desire, then click save. 
 
+**Set_Speed_And_Behaviors:**
+Set your high and low speed range, it can be in increments of 0.1 but try not to do faster that 0.2
+You can also set rapid refrehs rates for when a block is attempted, or set rapidvalue to 0 to turn off
+
 | Value | Description |
 |--|--|
 | Headstart | How far (in minutes) in the future a block must be to be considered  |
