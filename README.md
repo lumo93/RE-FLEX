@@ -37,10 +37,19 @@ Everything is done from `Script_Dock.py` (double click the script to run it, or 
 ## Setup
 
 **Set_App_Version**
-Put the latest Android Flex app version here and click save (currently `3.87.2.1.0`)
+Put the latest Android Flex app version here and click save (currently `3.89.3.38.0`)
 
 **Set_User_Agent**
 Select a device from the list and click set, or click random. Once set, this button will not be here in the future when running script dock to prevent different user agent devices.
+
+**Start Main**
+DISCLAIMER: This is only to sign in
+
+Click to start, you may get a message in the console with a long URL. Copy that into your browser and log in with your Flex account. You'll reach a page that says "this page can't be found" - that's OK - copy the URL (will include word "maplanding") and paste back into the terminal that Script_Dock opened with. Scanning will start. An exception should come up, that's fine, there are more steps.
+
+**Set_Speed_And_Behaviors:**
+Set your high and low speed range, it can be in increments of 0.1 but try not to do faster that 0.2
+You can also set rapid refrehs rates for when a block is attempted, or set rapidvalue to 0 to turn off
 
 **Choose_Station_Filter:**
 Select the stations you want to work at, and click Generate List, you can close this
@@ -49,21 +58,17 @@ Select the stations you want to work at, and click Generate List, you can close 
 **Set_Filter_Values:**
 Set your filters based on whatever criteria you desire, then click save. 
 
-**Set_Speed_And_Behaviors:**
-Set your high and low speed range, it can be in increments of 0.1 but try not to do faster that 0.2
-You can also set rapid refrehs rates for when a block is attempted, or set rapidvalue to 0 to turn off
 
 | Value | Description |
 |--|--|
 | Headstart | How far (in minutes) in the future a block must be to be considered  |
 | Minlength | The minimum block length (in hours) you want to work *(i.e. if set to 3 will not book any 2 hour blocks)* |
+| Maxlength | The maximum block length (in hours) you want to work *(i.e. if set to 3 will not book any 4 hour blocks)* |
 | Rate | The hourly block rate you want to work for *(i.e. if set to $20 it will not book blocks paying less per hour)* |
 | Lowprice | The lowest total pay you would work a block for *(i.e. if set to $70 it will not book blocks that are paying $54)* |
 
-
 **Start Main**
-Click to start, you may get a message in the console with a long URL. Copy that into your browser and log in with your Flex account. You'll reach a page that says "this page can't be found" - that's OK - copy the URL (will include word "maplanding") and paste back into the terminal that Script_Dock opened with. Scanning will start. Stop scanning using stop button. 
-
+If you did everything, you should see it starting to look for offers
 
 **Check_Logs**
 
