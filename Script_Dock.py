@@ -63,8 +63,14 @@ class App:
         # Find the script in the list of scripts
         script = next(s for s in self.scripts if s["name"] == script_name)
 
+        if script["process"] is not None and script["process"].poll() is None:
+            # The script is already running, so don't start another process
+            print(f"{script_name} is already running")
+            return
+
         # Start the main script in the current terminal window
         script["process"] = subprocess.Popen([python, script_name + ".py"])
+
 
     def check_status(self, script_name):
         # Find the script in the list of scripts
@@ -107,9 +113,9 @@ for script in scripts:
 
 if not os.path.exists("userdata/useragent"):
 
-    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "Set_Speeds_and_Behavior", "Set_User_Agent", "delete_access_token"]
+    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "Set_Speeds_and_Behavior", "Offer_List_Debug", "Set_User_Agent", "delete_access_token"]
 else:
-    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "Set_Speeds_and_Behavior", "delete_access_token"]
+    scriptsn = ["Check_Logs", "Choose_Station_Filter", "Set_Filter_Values", "Set_App_Version", "Set_Speeds_and_Behavior", "Offer_List_Debug", "delete_access_token"]
 
 for script in scriptsn:
     app.add_script(script, has_stop_button=False)
