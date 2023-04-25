@@ -1,6 +1,8 @@
 
 # RE-FLEX
 
+## Download
+To download, click on the green 'code' button and 'download zip'.
 
 ## Install
 
