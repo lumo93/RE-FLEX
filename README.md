@@ -7,6 +7,9 @@ To download, click on the green 'code' button and 'download zip'.
 ## Install
 
 Install Python on Windows or Linux (should work on Mac but has not been tested)
+
+be sure for Windows to "add 'python.exe' to path"
+
 Supported Python versions:
 
 3.9
