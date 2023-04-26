@@ -13,10 +13,6 @@ if not os.path.exists("userdata/useragent"):
     print("Please set your useragent!")
     exit()
 
-if not os.path.exists("userdata/speed_behavior_values.py"):
-    print("Please set your Speeds and Behavior settings!")
-    exit()
-
 def load_data(filepath):
     with open(filepath, 'r') as f:
         data = f.read()
@@ -200,6 +196,11 @@ def accept_block(block):
         logging.info(f"Caught The Block For {block['rateInfo']['priceAmount']}")
         debug.caught_print(block)
         yagmail_alert.email_alert(block)
+    elif accept.status_code == 307:
+        print("[+] Captcha challenge detected! Please follow the URL below and solve the challenge to continue:")
+        url = accept.json()['challengeMetadata']['WebUrl']
+        print(url)
+        input("Press Enter to continue after solving the challenge.")
     else:
         if(rapidrefresh>=rapidvalue):
             live_updates.live_mode(block)
