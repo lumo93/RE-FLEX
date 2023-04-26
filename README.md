@@ -44,7 +44,7 @@ Put the latest Android Flex app version here and click save (currently `3.89.3.3
 
 Select a device from the list and click set, or click random. Once set, this button will not be here in the future when running script dock to prevent different user agent devices.
 
-**Start Main**
+**Start_Main**
 
 DISCLAIMER: This is only to sign in
 
@@ -73,7 +73,7 @@ Set your filters based on whatever criteria you desire, then click save.
 | Rate | The hourly block rate you want to work for *(i.e. if set to $20 it will not book blocks paying less per hour)* |
 | Lowprice | The lowest total pay you would work a block for *(i.e. if set to $70 it will not book blocks that are paying $54)* |
 
-**Start Main**
+**Start_Main**
 
 If you did everything, you should see it starting to look for offers
 
