@@ -53,7 +53,7 @@ Click to start, you may get a message in the console with a long URL. Copy that 
 **Set_Speed_And_Behaviors**
 
 Set your high and low speed range, it can be in increments of 0.1 but try not to do faster that 0.2
-You can also set rapid refrehs rates for when a block is attempted, or set rapidvalue to 0 to turn off
+You can also set rapid refresh rates for when a block is attempted, or set rapidvalue to 0 to turn off
 
 **Choose_Station_Filter**
 
