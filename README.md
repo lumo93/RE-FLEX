@@ -67,7 +67,8 @@ Set your filters based on whatever criteria you desire, then click save.
 | Rate | The hourly block rate you want to work for *(i.e. if set to $20 it will not book blocks paying less per hour)* |
 | Lowprice | The lowest total pay you would work a block for *(i.e. if set to $70 it will not book blocks that are paying $54)* |
 
-**Start Main**
+**Start Main:**
+
 If you did everything, you should see it starting to look for offers
 
 **Check_Logs**
