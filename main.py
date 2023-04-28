@@ -6,7 +6,6 @@ import authCycle, getServiceAreas
 import os
 from amz_request import amz_request
 from urllib.parse import urlparse, parse_qs
-from yagmail_alert import Yagmail
 
 if not os.path.exists("userdata/version"):
     print("Please set the current Android Flex app version!\nFollowed by the useragent!")
@@ -32,6 +31,8 @@ except:
     authCycle.authCycle()
     getServiceAreas.getAllServiceAreas()
     stationlist = load_data('userdata/serviceAreaIds')
+    
+from yagmail_alert import Yagmail
 
 import filters, live_updates, debug
 
