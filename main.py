@@ -133,8 +133,12 @@ def get_offer_list(rejected_ids: set):
             if block['serviceAreaId'] in rejected_ids:
                 continue
             block_in_list = block['serviceAreaId'] in filters.station_list
-            headstart = filters.time_headstart(block, current_time)
-            adv_filter = filters.advanced_filter(block)
+            if block_in_list:
+                headstart = filters.time_headstart(block, current_time)
+                adv_filter = filters.advanced_filter(block)
+            else:
+                headstart = True
+                adv_filter = True
             if block_in_list and headstart and adv_filter and not block["hidden"]:
                 status = accept_block(block)
                 if status == 200:
