@@ -4,6 +4,9 @@ import header_data
 import json_data
 import authCycle, getServiceAreas
 import os
+from amz_request import amz_request
+from urllib.parse import urlparse, parse_qs
+from yagmail_alert import Yagmail
 
 if not os.path.exists("userdata/version"):
     print("Please set the current Android Flex app version!\nFollowed by the useragent!")
@@ -30,7 +33,7 @@ except:
     getServiceAreas.getAllServiceAreas()
     stationlist = load_data('userdata/serviceAreaIds')
 
-import filters, live_updates, yagmail_alert, debug
+import filters, live_updates, debug
 
 keys = []
 
@@ -91,35 +94,57 @@ session = requests.Session()
 
 print('Scanning started at', time.strftime('%I:%M:%S %p'))
 
-def get_offer_list():
-    authCycle.requestId_refresh()
+def get_offer_list(rejected_ids: set):
     global session
-    response = session.post(
-        "https://flex-capacity-na.amazon.com/GetOffersForProviderPost",
-        headers=header_data.headers,
+    start = time.time()
+    response = amz_request(
+        method="post", 
+        url="https://flex-capacity-na.amazon.com/GetOffersForProviderPost",
         json=json_data.search_json_data,
+        session=session
     )
-    j = json.loads(response.text)
-    offer_accepted = False
-    with open ("debugging/test", "a") as t:
-        if "message" in j:
-            print(f"{time.strftime('%I:%M:%S %p')}, {j}", file=t)
-        elif 'Message' in j:
-            msg = j['Message']
-            first_word = msg.split()[0] if msg else ''
-            if first_word == 'before':
-                print(f"{time.strftime('%I:%M:%S %p')}, {'Message: TokenException'}", file=t)
+    if response.status_code != 200:
+        try:
+            j = json.loads(response.text)
+        except:
+            j = None
+        with open ("debugging/test", "a+") as t:
+            if j:
+                if "message" in j:
+                    print(f"{time.strftime('%I:%M:%S %p')}, {j}", file=t)
+                elif 'Message' in j:
+                    msg = j['Message']
+                    first_word = msg.split()[0] if msg else ''
+                    if first_word == 'before':
+                        print(f"{time.strftime('%I:%M:%S %p')}, {'Message: TokenException'}", file=t)
+                    else:
+                        print(f"{time.strftime('%I:%M:%S %p')}, {j}", file=t)
             else:
-                print(f"{time.strftime('%I:%M:%S %p')}, {j}", file=t)
+               print(f"{time.strftime('%I:%M:%S %p')}, Status code: {response.status_code}, {response.text}", file=t) 
+        return []
+    j = json.loads(response.text)
+    #print(f"Time to get offer list response: {time.time() - start}")
+    offer_accepted = False
+
     try:
+        start = time.time()
+        current_time = int(start)
         for block in j["offerList"]:
-            if block['serviceAreaId'] in filters.station_list and filters.time_headstart(block) and filters.advanced_filter(block) and not block["hidden"] and not offer_accepted:
+            if block['serviceAreaId'] in rejected_ids:
+                continue
+            block_in_list = block['serviceAreaId'] in filters.station_list
+            headstart = filters.time_headstart(block, current_time)
+            adv_filter = filters.advanced_filter(block)
+            if block_in_list and headstart and adv_filter and not block["hidden"]:
                 status = accept_block(block)
                 if status == 200:
                     offer_accepted = True
                     break
+            else:
+                rejected_ids.add(block['serviceAreaId'])
             #list_format(block)
-            l_mode(block)
+            l_mode(block, block_in_list, headstart, adv_filter)
+        #print(f"Processing time: {time.time() - start}")
     except KeyError:
         try:
             return j["message"]
@@ -155,28 +180,30 @@ def live_update_code(block):
     if(rapidrefresh<rapidvalue):
         pass
 
-def l_mode(block):
-    b_length = (block["endTime"] - block["startTime"]) / 3600
-    b_price = block["rateInfo"]["priceAmount"]
-    b_rate = b_price / b_length
-    if block['serviceAreaId'] in filters.station_list:
-        if filters.time_headstart(block) and not filters.advanced_filter(block) and b_rate > 18 and not block["hidden"]:
-            debug.scan_print(block)
-        if filters.advanced_filter(block) and not filters.time_headstart(block) and not block["hidden"]:
-            debug.nheadstart_print(block)
+def l_mode(block, block_in_list, headstart, adv_filter):
+    if block_in_list:
+        if not block["hidden"]:
+            b_length = (block["endTime"] - block["startTime"]) / 3600
+            b_price = block["rateInfo"]["priceAmount"]
+            b_rate = b_price / b_length
+            if headstart and not adv_filter and b_rate > 18:
+                debug.scan_print(block)
+            if adv_filter and not headstart:
+                debug.nheadstart_print(block)
+        if filters.baserate_filter(block):
+            debug.baserate_print(block)
 #    if block['serviceAreaId'] not in filters.station_list:
 #        if b_rate > 18:
 #            debug.baserate_print(block)
-    lm_base(block)
     
 def l_rapid(block):
     if block['serviceAreaId'] in filters.station_list:
-        if filters.advanced_filter(block) and filters.time_headstart(block):
+        if filters.advanced_filter(block) and filters.time_headstart(block, int(time.time())):
             live_updates.live_rapid(block)
             live_updates.rapid_history(block)
 
 def lm_base(block):
-    if block['serviceAreaId'] in filters.station_list and filters.baserate_filter(block):
+    if filters.baserate_filter(block):
         debug.baserate_print(block)
 
 
@@ -184,10 +211,11 @@ def accept_block(block):
     # Accepting a block, returns status code. 200 is a successful attempt and 400 (I think, could be 404 or something else) is a failed attempt
     global session
     global rapidrefresh
-    accept = session.post(
-        "https://flex-capacity-na.amazon.com/AcceptOffer",
-        headers=header_data.headers,
+    accept = amz_request(
+        method="post", 
+        url="https://flex-capacity-na.amazon.com/AcceptOffer",
         json=json_data.accept_json_data(block["offerId"]),
+        session=session
     )
 
     if accept.status_code == 200:
@@ -195,12 +223,35 @@ def accept_block(block):
         live_updates.print_history(block)
         logging.info(f"Caught The Block For {block['rateInfo']['priceAmount']}")
         debug.caught_print(block)
-        yagmail_alert.email_alert(block)
+        try:
+            yagmail = Yagmail()
+            yagmail.email_alert(block)
+        except:
+            pass
     elif accept.status_code == 307:
         print("[+] Captcha challenge detected! Please follow the URL below and solve the challenge to continue:")
         url = accept.json()['challengeMetadata']['WebUrl']
         print(url)
-        input("Press Enter to continue after solving the challenge.")
+        input_accepted = False
+        validation_id = None
+        while not validation_id:
+            while not input_accepted:
+                validation_url = input("Paste the URL which results from completing the Captcha. It contains the phrase 'uniqueValidationId': ")
+                if "uniqueValidationId" in validation_url:
+                    input_accepted = True
+                else:
+                    print("The URL does not contain the uniqueValidationId. Please try again.")
+            try:
+                parsed_query = parse_qs(urlparse(validation_url).query)
+                j = json.loads(parsed_query['sessionToken'][0])
+                validation_id = j['uniqueValidationId']
+            except:
+                print("The URL does not match the expected format. Please try again.")
+                input_accepted = False
+        validated = validate_captcha(validation_id)
+        if not validated:
+            exit() #TODO
+        
     else:
         if(rapidrefresh>=rapidvalue):
             live_updates.live_mode(block)
@@ -213,6 +264,23 @@ def accept_block(block):
         rapidrefresh = 0
 
     return accept.status_code
+
+def validate_captcha(validationId: str) -> bool:
+    data = {
+        "challengeToken": f'{{"uniqueValidationId":"{validationId}"}}'
+    }
+    res = amz_request(
+        method="post",
+        url="https://flex-capacity-na.amazon.com/ValidateChallenge",
+        json=data,
+        session=session
+    )
+    if res.status_code == 200:
+        print("Captcha verified!")
+        return True
+    else:
+        print(f"Error validating captcha. Code {res.status_code}, Message: {res.text}")
+        return False
 
 def file_age_in_seconds(pathname):
     """
@@ -235,34 +303,36 @@ def check_header_file():
 
 if __name__ == "__main__":
 
-    authCycle.instanceCycle()
     authCycle.authCycle()
+    authCycle.instanceCycle()
     authCycle.areaIdCycle()
 
     keepItUp = True
+    rejected_ids = set()
     while keepItUp:
-            print('Scanning...', datetime.now().strftime('%S:%f'), end='\r')
-            check_header_file()
-            try:
-                lst = get_offer_list()
-            except:
-                #traceback.print_exc()
-                authCycle.authCycle()
-            if lst == "Rate exceeded":
-                logging.info("Rate Exceeded, Waiting")
-                rate_sleep_print()
-                time.sleep(ratelimitsleep*60)
-                logging.info("Resuming operations")
-                rate_wake_print()
-                authCycle.authCycle()
-            try:
-                if 200 in lst:
-                    keepItUp = False
-                    quit()
-            except:
-                pass
-            if(rapidrefresh<rapidvalue):
-                rapidrefresh+=1
-                time.sleep(random.uniform(rapidtimelow, rapidtimehigh))
-            else:
-                time.sleep(random.uniform(timelow, timehigh))
+        print('Scanning...', datetime.now().strftime('%S:%f'), end='\r')
+        check_header_file()
+        try:
+            lst = get_offer_list(rejected_ids)
+        except:
+            #traceback.print_exc()
+            authCycle.authCycle()
+            lst = get_offer_list(rejected_ids)
+        if lst == "Rate exceeded":
+            logging.info("Rate Exceeded, Waiting")
+            rate_sleep_print()
+            time.sleep(ratelimitsleep*60)
+            logging.info("Resuming operations")
+            rate_wake_print()
+            authCycle.authCycle()
+        try:
+            if 200 in lst:
+                keepItUp = False
+                quit()
+        except:
+            pass
+        if(rapidrefresh<rapidvalue):
+            rapidrefresh+=1
+            time.sleep(random.uniform(rapidtimelow, rapidtimehigh))
+        else:
+            time.sleep(random.uniform(timelow, timehigh))

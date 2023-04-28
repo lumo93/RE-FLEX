@@ -1,7 +1,6 @@
-import requests
 from datetime import datetime
 import header_data
-import authCycle
+from amz_request import amz_request
 
 
 def __getAmzDate() -> str:
@@ -12,22 +11,19 @@ def __getAmzDate() -> str:
 
 def getEligibleServiceAreas():
 
-    authCycle.requestId_refresh()
     header_data.headers["X-Amz-Date"] = __getAmzDate()
-    response = requests.get(
-    "https://flex-capacity-na.amazon.com/eligibleServiceAreas",
-    headers=header_data.headers)
+    response = amz_request(
+        method="get", 
+        url="https://flex-capacity-na.amazon.com/eligibleServiceAreas"
+    )
     return response.json().get("serviceAreaIds")
 
 def getAllServiceAreas():
 
-    authCycle.requestId_refresh()
-
     header_data.headers["X-Amz-Date"] = __getAmzDate()
-
-    serviceAreaPoolList = requests.get(
-    "https://flex-capacity-na.amazon.com/getOfferFiltersOptions",
-    headers=header_data.headers
+    serviceAreaPoolList = amz_request(
+        method="get", 
+        url="https://flex-capacity-na.amazon.com/getOfferFiltersOptions"
     ).json().get("serviceAreaPoolList")
     with open("userdata/serviceAreaIds", "w", encoding='utf-8') as s:
         #print('stationlist = {', file=s)

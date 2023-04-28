@@ -7,5 +7,3 @@ headers = {
     'X-Amzn-RequestId': 'requestId',
     'Connection': 'Keep-Alive',
 }
-
-del headers["X-Flex-Client-Time"]
