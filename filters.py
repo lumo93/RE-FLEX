@@ -24,7 +24,7 @@ def baserate_filter(block):
     # Comment out the second line if you want to print base rate
     b_length = (block["endTime"] - block["startTime"]) / 3600
     b_price = block["rateInfo"]["priceAmount"]
-    b_headstart = block["startTime"] - int(time.time())
+    #b_headstart = block["startTime"] - int(time.time())
     b_rate = b_price / b_length
     return (
         b_rate == 18
@@ -51,10 +51,10 @@ def advanced_filter(block):
             b_price >= lowprice
         )
 
-def time_headstart(block):
+def time_headstart(block, current_time: int):
     b = station_list[block['serviceAreaId']]
     headstart = b['headstart']
-    b_headstart = block["startTime"] - int(time.time())
+    b_headstart = block["startTime"] - current_time
     return(
         b_headstart >= headstart*60
     )

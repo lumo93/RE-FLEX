@@ -114,13 +114,13 @@ def register_account(maplanding_url):
 
     url = 'https://api.amazon.com/auth/register'
     reg_headers = {
-                    "User-Agent": USER_AGENT,
-                    "Content-Type": "application/json",
-                    "Accept-Charset": "utf-8",
-                    "x-amzn-identity-auth-domain": "api.amazon.com",
-                    "Connection": "keep-alive",
-                    "Accept": "/",
-                    "Accept-Language": "en-US"
+        "User-Agent": USER_AGENT,
+        "Content-Type": "application/json",
+        "Accept-Charset": "utf-8",
+        "x-amzn-identity-auth-domain": "api.amazon.com",
+        "Connection": "keep-alive",
+        "Accept": "/",
+        "Accept-Language": "en-US"
     }
     res = requests.post(url, json=amazon_reg_data, headers=reg_headers, verify=True)
     if res.status_code != 200:
@@ -166,7 +166,7 @@ def generate_frc(device_id):
     hmac_ = hmac.new(PBKDF2(device_id, b"HmacSHA256").read(32), iv + ciphertext, hashlib.sha256).digest()
     return base64.b64encode(b"\0" + hmac_[:8] + iv + ciphertext).decode()
 
-def get_flex_auth_token(refresh_token):
+def get_flex_auth_token(refresh_token: str) -> str:
     url = 'https://api.amazon.com/auth/token'
     data = {
         "app_name": APP_NAME,
@@ -179,13 +179,35 @@ def get_flex_auth_token(refresh_token):
         "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; Pixel 2 Build/OPM1.171019.021)",
         "x-amzn-identity-auth-domain": "api.amazon.com",
     }
-    res = requests.post(url, json=data, headers=headers).json()
-    #print(res)
-    x_amz_access_token = res['access_token']
-    #print(x_amz_access_token)
-    return(x_amz_access_token)
+    res = requests.post(url, json=data, headers=headers)
+    if res.status_code == 400:
+        try:
+            msg = res.json()
+            if msg["error_description"] == "The request has an invalid parameter : source_token":
+                print("Error: Device was deregistered")
+            else:
+                print(f"Error refreshing token. Code 400, Message: {msg}")
+        except:
+            print(f"Error refreshing token. Code 400, Message: {res.text}")
+        exit() #TODO
+    elif res.status_code != 200:
+        print(f"Error refreshing token. Code {res.status_code}, Message: {res.text}")
+        exit() #TODO
+    try:
+        res_json = res.json()
+        if 'access_token' in res_json:
+            x_amz_access_token = res_json['access_token']
+        else:
+            print(f"Error refreshing token. Code {res.status_code}, Message: {res.text}")
+            exit() #TODO
+    except Exception as e:
+        print(f"Error refreshing token. Code {res.status_code}, Message: {res.text}")
+        exit() #TODO
+    return x_amz_access_token
 
 
 def refresh(refresh_token):
-        with open("userdata/access_token", "w") as t:
-                print(get_flex_auth_token(refresh_token), end='', file=t)
+    token = get_flex_auth_token(refresh_token)
+    with open("userdata/access_token", "w") as t:
+        print(token, end='', file=t)
+    return token

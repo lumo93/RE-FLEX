@@ -12,8 +12,8 @@ import os
 refresh_token = registerCycle.rCycle()
 
 def header_refresh():
-    register.refresh(refresh_token)
-    current_header()
+    new_token = register.refresh(refresh_token)
+    header_data.headers['x-amz-access-token'] = new_token
 
 def current_header():
     with open("userdata/access_token", "r") as t:
@@ -22,6 +22,7 @@ def current_header():
 
 def requestId_refresh():
     header_data.headers['X-Amzn-RequestId'] = requestIdSelfSingleUse()
+    header_data.headers['X-Flex-Client-Time'] = str(round(time.time() * 1000))
 
 def manual_token():
         token = manualTokenRefresh()
@@ -78,7 +79,7 @@ def authCycle():
 def instance_check():
     with open("userdata/instance_id", "r") as i:
         instanceId = i.read()
-        return(instanceId)
+    header_data.headers['x-flex-instance-id'] = instanceId
 
 def instance_make():
     with open("userdata/instance_id", "w") as i:
@@ -128,18 +129,18 @@ def manualTokenRefresh():
     return(token)
 
 def request_print():
-                time.sleep(1)
-                with open ("scandata/token-status", "a") as d:
-                    print('Token request at:', file=d)
-                    print(time.strftime('%m/%d/%Y %I:%M:%S %p'), file=d)
-                    print('------------------------------------', file=d)
-                print('Requesting token ....', end='\r')
+    time.sleep(1)
+    with open ("scandata/token-status", "a") as d:
+        print('Token request at:', file=d)
+        print(time.strftime('%m/%d/%Y %I:%M:%S %p'), file=d)
+        print('------------------------------------', file=d)
+    print('Requesting token ....', end='\r')
 
 def blocked_print():
-                with open ("scandata/token-status", "a") as d:
-                    print('Token request blocked:', file=d)
-                    print(time.strftime('%m/%d/%Y %I:%M:%S %p'), file=d)
-                    print('------------------------------------', file=d)
-                print(
-                    'Authentication rejected'
-                    )
+    with open ("scandata/token-status", "a") as d:
+        print('Token request blocked:', file=d)
+        print(time.strftime('%m/%d/%Y %I:%M:%S %p'), file=d)
+        print('------------------------------------', file=d)
+    print(
+        'Authentication rejected'
+        )
