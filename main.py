@@ -135,7 +135,7 @@ def get_offer_list(rejected_ids: set):
         start = time.time()
         current_time = int(start)
         for block in j["offerList"]:
-            if block['serviceAreaId'] in rejected_ids:
+            if block['offerId'] in rejected_ids:
                 continue
             block_in_list = block['serviceAreaId'] in filters.station_list
             if block_in_list:
@@ -150,7 +150,7 @@ def get_offer_list(rejected_ids: set):
                     offer_accepted = True
                     break
             else:
-                rejected_ids.add(block['serviceAreaId'])
+                rejected_ids.add(block['offerId'])
             #list_format(block)
             l_mode(block, block_in_list, headstart, adv_filter)
         #print(f"Processing time: {time.time() - start}")
