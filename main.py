@@ -55,8 +55,6 @@ with open('userdata/chosen_station_list', 'r') as f:
 
 with open('userdata/useragent', 'r') as u:
     ua = u.read()
-if not ver:
-    with open('userdata/version', 'r') as v:
 
 header_data.headers['User-Agent'] = f"'{ua} RabbitAndroid/{ver}'"
 # update the value of serviceAreaFilter in search_json_data
