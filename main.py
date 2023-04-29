@@ -6,10 +6,16 @@ import authCycle, getServiceAreas
 import os
 from amz_request import amz_request
 from urllib.parse import urlparse, parse_qs
+from get_flex_version import get_flex_version
 
-if not os.path.exists("userdata/version"):
-    print("Please set the current Android Flex app version!\nFollowed by the useragent!")
-    exit()
+ver = get_flex_version()
+if not ver:
+    if not os.path.exists("userdata/version"):
+        print("Please set the current Android Flex app version!\nFollowed by the useragent!")
+        exit()
+    else:
+        with open('userdata/version', 'r') as v:
+            ver = v.read()
 
 if not os.path.exists("userdata/useragent"):
     print("Please set your useragent!")
@@ -49,8 +55,10 @@ with open('userdata/chosen_station_list', 'r') as f:
 
 with open('userdata/useragent', 'r') as u:
     ua = u.read()
-with open('userdata/version', 'r') as v:
-    ver = v.read()
+ver = get_flex_version()
+if not ver:
+    with open('userdata/version', 'r') as v:
+        ver = v.read()
 
 header_data.headers['User-Agent'] = f"'{ua} RabbitAndroid/{ver}'"
 # update the value of serviceAreaFilter in search_json_data
