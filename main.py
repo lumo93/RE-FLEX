@@ -109,24 +109,31 @@ def get_offer_list(rejected_ids: set):
         session=session
     )
     if response.status_code != 200:
-        try:
+        if response.status_code == 400:
             j = json.loads(response.text)
-        except:
-            j = None
-        with open ("debugging/test", "a+") as t:
-            if j:
+            with open ("debugging/test", "a+") as t:
                 if "message" in j:
                     print(f"{time.strftime('%I:%M:%S %p')}, {j}", file=t)
-                elif 'Message' in j:
-                    msg = j['Message']
-                    first_word = msg.split()[0] if msg else ''
-                    if first_word == 'before':
-                        print(f"{time.strftime('%I:%M:%S %p')}, {'Message: TokenException'}", file=t)
-                    else:
-                        print(f"{time.strftime('%I:%M:%S %p')}, {j}", file=t)
-            else:
-               print(f"{time.strftime('%I:%M:%S %p')}, Status code: {response.status_code}, {response.text}", file=t) 
-        return []
+            return [400]
+        else:
+            try:
+                j = json.loads(response.text)
+            except:
+                j = None
+            with open ("debugging/test", "a+") as t:
+                if j:
+                    if "message" in j:
+                        print(f"{time.strftime('%I:%M:%S %p')}, {j}, \nStatus code: {response.status_code}", file=t)
+                    elif 'Message' in j:
+                        msg = j['Message']
+                        first_word = msg.split()[0] if msg else ''
+                        if first_word == 'before':
+                            print(f"{time.strftime('%I:%M:%S %p')}, {'Message: TokenException'}, \nStatus code: {response.status_code}", file=t)
+                        else:
+                            print(f"{time.strftime('%I:%M:%S %p')}, {j}, \nStatus code: {response.status_code}", file=t)
+                else:
+                    print(f"{time.strftime('%I:%M:%S %p')}, Status code: {response.status_code}, {response.text}", file=t) 
+            return []
     j = json.loads(response.text)
     #print(f"Time to get offer list response: {time.time() - start}")
     offer_accepted = False
@@ -327,7 +334,7 @@ if __name__ == "__main__":
             #traceback.print_exc()
             authCycle.authCycle()
             lst = get_offer_list(rejected_ids)
-        if lst == "Rate exceeded":
+        if 400 in lst:
             logging.info("Rate Exceeded, Waiting")
             rate_sleep_print()
             time.sleep(ratelimitsleep*60)
@@ -336,8 +343,10 @@ if __name__ == "__main__":
             authCycle.authCycle()
         try:
             if 200 in lst:
-                keepItUp = False
-                quit()
+                #keepItUp = False
+                #quit()
+                print('waiting', '\r')
+                time.sleep(10)
         except:
             pass
         if(rapidrefresh<rapidvalue):
