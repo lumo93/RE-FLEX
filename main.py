@@ -343,10 +343,10 @@ if __name__ == "__main__":
             authCycle.authCycle()
         try:
             if 200 in lst:
-                #keepItUp = False
-                #quit()
-                print('waiting', '\r')
-                time.sleep(10)
+                keepItUp = False
+                quit()
+                #print('waiting', '\r')
+                #time.sleep(10)
         except:
             pass
         if(rapidrefresh<rapidvalue):
