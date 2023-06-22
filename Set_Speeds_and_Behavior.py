@@ -2,7 +2,7 @@ import tkinter as tk
 import os
 
 def update_values():
-    global timehigh, timelow, rapidvalue, rapidtimehigh, rapidtimelow, ratelimitsleep
+    global timehigh, timelow, rapidvalue, rapidtimehigh, rapidtimelow, ratelimitsleep, starttime, endtime, resume
 
     timehigh = float(timehigh_entry.get())
     timelow = float(timelow_entry.get())
@@ -10,6 +10,9 @@ def update_values():
     rapidtimehigh = float(rapidtimehigh_entry.get())
     rapidtimelow = float(rapidtimelow_entry.get())
     ratelimitsleep = int(ratelimitsleep_entry.get())
+    starttime = str(starttime_entry.get())
+    endtime = str(endtime_entry.get())
+    resume = str(resume_entry.get())
 
     with open("userdata/speed_behavior_values.py", "w") as f:
         f.write(f"timehigh={timehigh}\n")
@@ -18,6 +21,9 @@ def update_values():
         f.write(f"rapidtimehigh={rapidtimehigh}\n")
         f.write(f"rapidtimelow={rapidtimelow}\n")
         f.write(f"ratelimitsleep={ratelimitsleep}\n")
+        f.write(f"starttime={starttime}\n")
+        f.write(f"endtime={endtime}\n")
+        f.write(f"resume={resume}\n")
     print("Speeds and Behavior set")
 
 root = tk.Tk()
@@ -68,6 +74,27 @@ if os.path.exists("userdata/speed_behavior_values.py"):
     ratelimitsleep_entry.insert(0, sbv.ratelimitsleep)
     ratelimitsleep_entry.grid(row=5, column=1)
 
+    starttime_label = tk.Label(root, text="starttime")
+    starttime_label.grid(row=6, column=0)
+
+    starttime_entry = tk.Entry(root)
+    starttime_entry.insert(0, f'"{sbv.starttime}"')
+    starttime_entry.grid(row=6, column=1)
+
+    endtime_label = tk.Label(root, text="endtime")
+    endtime_label.grid(row=7, column=0)
+
+    endtime_entry = tk.Entry(root)
+    endtime_entry.insert(0, f'"{sbv.endtime}"')
+    endtime_entry.grid(row=7, column=1)
+
+    resume_label = tk.Label(root, text="resume")
+    resume_label.grid(row=8, column=0)
+
+    resume_entry = tk.Entry(root)
+    resume_entry.insert(0, f'"{sbv.resume}"')
+    resume_entry.grid(row=8, column=1)
+
 else:
     timehigh_label = tk.Label(root, text="timehigh")
     timehigh_label.grid(row=0, column=0)
@@ -87,7 +114,7 @@ else:
     rapidvalue_label.grid(row=2, column=0)
 
     rapidvalue_entry = tk.Entry(root)
-    rapidvalue_entry.insert(0, "1")
+    rapidvalue_entry.insert(0, "0")
     rapidvalue_entry.grid(row=2, column=1)
 
     rapidtimehigh_label = tk.Label(root, text="rapidtimehigh")
@@ -111,7 +138,28 @@ else:
     ratelimitsleep_entry.insert(0, "45")
     ratelimitsleep_entry.grid(row=5, column=1)
 
+    starttime_label = tk.Label(root, text="starttime")
+    starttime_label.grid(row=6, column=0)
+
+    starttime_entry = tk.Entry(root)
+    starttime_entry.insert(0, '"1:00"')
+    starttime_entry.grid(row=6, column=1)
+
+    endtime_label = tk.Label(root, text="endtime")
+    endtime_label.grid(row=7, column=0)
+
+    endtime_entry = tk.Entry(root)
+    endtime_entry.insert(0, '"23:00"')
+    endtime_entry.grid(row=7, column=1)
+
+    resume_label = tk.Label(root, text="resume")
+    resume_label.grid(row=8, column=0)
+
+    resume_entry = tk.Entry(root)
+    resume_entry.insert(0, f'False')
+    resume_entry.grid(row=8, column=1)
+
 update_button = tk.Button(root, text="Update", command=update_values)
-update_button.grid(row=6, column=0, columnspan=2, pady=10)
+update_button.grid(row=9, column=0, columnspan=2, pady=10)
 
 root.mainloop()

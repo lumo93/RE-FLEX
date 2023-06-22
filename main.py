@@ -93,6 +93,12 @@ def rate_wake_print():
         print(time.strftime('%m/%d/%Y %I:%M:%S %p'), file=d)
         print('------------------------------------', file=d)
 
+def captcha_trigger_print():
+    with open ("scandata/token-status", "a") as d:
+        print('Captcha Triggered, at:', file=d)
+        print(time.strftime('%m/%d/%Y %I:%M:%S %p'), file=d)
+        print('------------------------------------', file=d)
+
 logging.basicConfig(format="%(asctime)s \n\t%(message)s", datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 
 session = requests.Session()
@@ -206,6 +212,8 @@ def l_mode(block, block_in_list, headstart, adv_filter):
                 debug.scan_print(block)
             if adv_filter and not headstart:
                 debug.nheadstart_print(block)
+        if block["hidden"]:
+            debug.scan_print(block)
         if filters.baserate_filter(block):
             debug.baserate_print(block)
 #    if block['serviceAreaId'] not in filters.station_list:
@@ -245,6 +253,7 @@ def accept_block(block):
         except:
             pass
     elif accept.status_code == 307:
+        captcha_trigger_print()
         print("[+] Captcha challenge detected! Please follow the URL below and solve the challenge to continue:")
         url = accept.json()['challengeMetadata']['WebUrl']
         print(url)
@@ -343,10 +352,12 @@ if __name__ == "__main__":
             authCycle.authCycle()
         try:
             if 200 in lst:
-                keepItUp = False
-                quit()
-                #print('waiting', '\r')
-                #time.sleep(10)
+                keepItUp = sbv.resume
+                if keepItUp:
+                    print('waiting', '\r')
+                    time.sleep(10)
+                else:
+                    quit()
         except:
             pass
         if(rapidrefresh<rapidvalue):

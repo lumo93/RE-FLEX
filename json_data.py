@@ -1,11 +1,17 @@
+import userdata.speed_behavior_values as time
+
+start = time.starttime
+end = time.endtime
+
+
 search_json_data = {
     'apiVersion': 'V2',
     'filters': {
         'serviceAreaFilter': [
         ], 
         "timeFilter": {
-            #"endTime": "23:00",
-            #"startTime": "11:00"
+            "endTime": end,
+            "startTime": start
         }   
     },
     "serviceAreaIds": ['areaId']
