@@ -92,7 +92,7 @@ if os.path.exists("userdata/speed_behavior_values.py"):
     resume_label.grid(row=8, column=0)
 
     resume_entry = tk.Entry(root)
-    resume_entry.insert(0, f'"{sbv.resume}"')
+    resume_entry.insert(0, f'{sbv.resume}')
     resume_entry.grid(row=8, column=1)
 
 else:
