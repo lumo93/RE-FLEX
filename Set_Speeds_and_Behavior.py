@@ -12,7 +12,7 @@ def update_values():
     ratelimitsleep = int(ratelimitsleep_entry.get())
     starttime = str(starttime_entry.get())
     endtime = str(endtime_entry.get())
-    resume = str(resume_entry.get())
+    resume = str(resume_value.get())
 
     with open("userdata/speed_behavior_values.py", "w") as f:
         f.write(f"timehigh={timehigh}\n")
@@ -88,12 +88,13 @@ if os.path.exists("userdata/speed_behavior_values.py"):
     endtime_entry.insert(0, f'"{sbv.endtime}"')
     endtime_entry.grid(row=7, column=1)
 
+    resume_value = tk.BooleanVar(value=sbv.resume)
+
     resume_label = tk.Label(root, text="resume")
     resume_label.grid(row=8, column=0)
 
-    resume_entry = tk.Entry(root)
-    resume_entry.insert(0, f'{sbv.resume}')
-    resume_entry.grid(row=8, column=1)
+    resume_checkbox = tk.Checkbutton(root, variable=resume_value)
+    resume_checkbox.grid(row=8, column=1)
 
 else:
     timehigh_label = tk.Label(root, text="timehigh")
@@ -152,12 +153,13 @@ else:
     endtime_entry.insert(0, '"23:00"')
     endtime_entry.grid(row=7, column=1)
 
+    resume_value = tk.BooleanVar(value=False)
+
     resume_label = tk.Label(root, text="resume")
     resume_label.grid(row=8, column=0)
 
-    resume_entry = tk.Entry(root)
-    resume_entry.insert(0, f'False')
-    resume_entry.grid(row=8, column=1)
+    resume_checkbox = tk.Checkbutton(root, variable=resume_value)
+    resume_checkbox.grid(row=8, column=1)
 
 update_button = tk.Button(root, text="Update", command=update_values)
 update_button.grid(row=9, column=0, columnspan=2, pady=10)
