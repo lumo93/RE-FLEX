@@ -21,8 +21,8 @@ def update_values():
         f.write(f"rapidtimehigh={rapidtimehigh}\n")
         f.write(f"rapidtimelow={rapidtimelow}\n")
         f.write(f"ratelimitsleep={ratelimitsleep}\n")
-        f.write(f"starttime={starttime}\n")
-        f.write(f"endtime={endtime}\n")
+        f.write(f'starttime="{starttime}"\n')
+        f.write(f'endtime="{endtime}"\n')
         f.write(f"resume={resume}\n")
     print("Speeds and Behavior set")
 
@@ -78,14 +78,14 @@ if os.path.exists("userdata/speed_behavior_values.py"):
     starttime_label.grid(row=6, column=0)
 
     starttime_entry = tk.Entry(root)
-    starttime_entry.insert(0, f'"{sbv.starttime}"')
+    starttime_entry.insert(0, sbv.starttime)
     starttime_entry.grid(row=6, column=1)
 
     endtime_label = tk.Label(root, text="endtime")
     endtime_label.grid(row=7, column=0)
 
     endtime_entry = tk.Entry(root)
-    endtime_entry.insert(0, f'"{sbv.endtime}"')
+    endtime_entry.insert(0, sbv.endtime)
     endtime_entry.grid(row=7, column=1)
 
     resume_value = tk.BooleanVar(value=sbv.resume)
@@ -143,14 +143,14 @@ else:
     starttime_label.grid(row=6, column=0)
 
     starttime_entry = tk.Entry(root)
-    starttime_entry.insert(0, '"1:00"')
+    starttime_entry.insert(0, '1:00')
     starttime_entry.grid(row=6, column=1)
 
     endtime_label = tk.Label(root, text="endtime")
     endtime_label.grid(row=7, column=0)
 
     endtime_entry = tk.Entry(root)
-    endtime_entry.insert(0, '"23:00"')
+    endtime_entry.insert(0, '23:00')
     endtime_entry.grid(row=7, column=1)
 
     resume_value = tk.BooleanVar(value=False)
