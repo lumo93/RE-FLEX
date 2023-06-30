@@ -204,15 +204,15 @@ def live_update_code(block):
 
 def l_mode(block, block_in_list, headstart, adv_filter):
     if block_in_list:
+        b_length = (block["endTime"] - block["startTime"]) / 3600
+        b_price = block["rateInfo"]["priceAmount"]
+        b_rate = b_price / b_length
         if not block["hidden"]:
-            b_length = (block["endTime"] - block["startTime"]) / 3600
-            b_price = block["rateInfo"]["priceAmount"]
-            b_rate = b_price / b_length
             if headstart and not adv_filter and b_rate > 18:
                 debug.scan_print(block)
             if adv_filter and not headstart:
                 debug.nheadstart_print(block)
-        if block["hidden"]:
+        if block["hidden"] and b_price > 18:
             debug.scan_print(block)
         if filters.baserate_filter(block):
             debug.baserate_print(block)
