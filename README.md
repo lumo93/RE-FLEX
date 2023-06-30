@@ -38,7 +38,7 @@ Everything is done from `Script_Dock.py` (double click the script to run it, or 
 
 **Set_App_Version**
 
-Put the latest Android Flex app version here and click save (currently `3.93.2.8.0`, double check because not everyone gets the update at once)
+Put the latest Android Flex app version here and click save (currently `3.93.3.3.0`, double check because not everyone gets the update at once)
 
 **Set_User_Agent**
 
