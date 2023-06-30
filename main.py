@@ -212,7 +212,7 @@ def l_mode(block, block_in_list, headstart, adv_filter):
                 debug.scan_print(block)
             if adv_filter and not headstart:
                 debug.nheadstart_print(block)
-        if block["hidden"] and b_price > 18:
+        if block["hidden"] and b_rate > 18:
             debug.scan_print(block)
         if filters.baserate_filter(block):
             debug.baserate_print(block)
