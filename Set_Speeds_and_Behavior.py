@@ -46,21 +46,21 @@ if os.path.exists("userdata/speed_behavior_values.py"):
     timelow_entry.insert(0, sbv.timelow)
     timelow_entry.grid(row=1, column=1)
 
-    rapidvalue_label = tk.Label(root, text="rapidvalue")
+    rapidvalue_label = tk.Label(root, text="burstvalue")
     rapidvalue_label.grid(row=2, column=0)
 
     rapidvalue_entry = tk.Entry(root)
     rapidvalue_entry.insert(0, sbv.rapidvalue)
     rapidvalue_entry.grid(row=2, column=1)
 
-    rapidtimehigh_label = tk.Label(root, text="rapidtimehigh")
+    rapidtimehigh_label = tk.Label(root, text="bursttimehigh")
     rapidtimehigh_label.grid(row=3, column=0)
 
     rapidtimehigh_entry = tk.Entry(root)
     rapidtimehigh_entry.insert(0, sbv.rapidtimehigh)
     rapidtimehigh_entry.grid(row=3, column=1)
 
-    rapidtimelow_label = tk.Label(root, text="rapidtimelow")
+    rapidtimelow_label = tk.Label(root, text="bursttimelow")
     rapidtimelow_label.grid(row=4, column=0)
 
     rapidtimelow_entry = tk.Entry(root)
@@ -111,21 +111,21 @@ else:
     timelow_entry.insert(0, "2.2")
     timelow_entry.grid(row=1, column=1)
 
-    rapidvalue_label = tk.Label(root, text="rapidvalue")
+    rapidvalue_label = tk.Label(root, text="burstvalue")
     rapidvalue_label.grid(row=2, column=0)
 
     rapidvalue_entry = tk.Entry(root)
     rapidvalue_entry.insert(0, "0")
     rapidvalue_entry.grid(row=2, column=1)
 
-    rapidtimehigh_label = tk.Label(root, text="rapidtimehigh")
+    rapidtimehigh_label = tk.Label(root, text="bursttimehigh")
     rapidtimehigh_label.grid(row=3, column=0)
 
     rapidtimehigh_entry = tk.Entry(root)
     rapidtimehigh_entry.insert(0, "0.4")
     rapidtimehigh_entry.grid(row=3, column=1)
 
-    rapidtimelow_label = tk.Label(root, text="rapidtimelow")
+    rapidtimelow_label = tk.Label(root, text="bursttimelow")
     rapidtimelow_label.grid(row=4, column=0)
 
     rapidtimelow_entry = tk.Entry(root)

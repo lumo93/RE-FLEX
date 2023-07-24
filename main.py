@@ -71,12 +71,12 @@ import traceback
 timehigh = sbv.timehigh
 timelow = sbv.timelow
 
-rapidvalue = sbv.rapidvalue
+burstvalue = sbv.rapidvalue
 
 rapidtimehigh = sbv.rapidtimehigh
 rapidtimelow = sbv.rapidtimelow
 
-rapidrefresh = rapidvalue
+burstrefresh = burstvalue
 
 #In Minutes
 ratelimitsleep = sbv.ratelimitsleep
@@ -196,11 +196,6 @@ def list_format(block):
         f'------------------------------------'
     )
 
-def live_update_code(block):
-    if(rapidrefresh>=rapidvalue):
-        l_mode(block)
-    if(rapidrefresh<rapidvalue):
-        pass
 
 def l_mode(block, block_in_list, headstart, adv_filter):
     if block_in_list:
@@ -234,7 +229,6 @@ def lm_base(block):
 def accept_block(block):
     # Accepting a block, returns status code. 200 is a successful attempt and 400 (I think, could be 404 or something else) is a failed attempt
     global session
-    global rapidrefresh
     accept = amz_request(
         method="post", 
         url="https://flex-capacity-na.amazon.com/AcceptOffer",
@@ -278,15 +272,10 @@ def accept_block(block):
             exit() #TODO
         
     else:
-        if(rapidrefresh>=rapidvalue):
-            live_updates.live_mode(block)
-            live_updates.print_history(block)
-        if(rapidrefresh<rapidvalue):
-            live_updates.live_rapid(block)
-            live_updates.rapid_history(block)
+        live_updates.live_mode(block)
+        live_updates.print_history(block)
         logging.info(f"Missed The Block For {block['rateInfo']['priceAmount']}")
         debug.missed_print(block)
-        rapidrefresh = 0
 
     return accept.status_code
 
@@ -360,8 +349,9 @@ if __name__ == "__main__":
                     quit()
         except:
             pass
-        if(rapidrefresh<rapidvalue):
-            rapidrefresh+=1
+        if(burstrefresh<burstvalue):
+            burstrefresh+=1
             time.sleep(random.uniform(rapidtimelow, rapidtimehigh))
-        else:
+        if(burstrefresh==burstvalue):
+            burstrefresh = 0
             time.sleep(random.uniform(timelow, timehigh))
