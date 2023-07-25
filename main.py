@@ -149,8 +149,6 @@ def get_offer_list(rejected_ids: set):
         start = time.time()
         current_time = int(start)
         for block in j["offerList"]:
-            with open ("debugging/droptime", "a+") as t:
-                print(f"{time.strftime('%I:%M:%S %p')}", file=t)
             if block['offerId'] in rejected_ids:
                 continue
             block_in_list = block['serviceAreaId'] in filters.station_list
@@ -161,6 +159,8 @@ def get_offer_list(rejected_ids: set):
                 headstart = True
                 adv_filter = True
             if block_in_list and headstart and adv_filter and not block["hidden"]:
+                with open ("debugging/droptime", "a+") as t:
+                    print(f"{time.strftime('%I:%M:%S %p')}", file=t)
                 status = accept_block(block)
                 if status == 200:
                     offer_accepted = True
