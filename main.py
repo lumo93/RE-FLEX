@@ -143,11 +143,14 @@ def get_offer_list(rejected_ids: set):
     j = json.loads(response.text)
     #print(f"Time to get offer list response: {time.time() - start}")
     offer_accepted = False
-
+    #with open ("debugging/test", "a+") as t:
+        #print(f"{time.strftime('%I:%M:%S %p')}, {j}", file=t)
     try:
         start = time.time()
         current_time = int(start)
         for block in j["offerList"]:
+            with open ("debugging/droptime", "a+") as t:
+                print(f"{time.strftime('%I:%M:%S %p')}", file=t)
             if block['offerId'] in rejected_ids:
                 continue
             block_in_list = block['serviceAreaId'] in filters.station_list
