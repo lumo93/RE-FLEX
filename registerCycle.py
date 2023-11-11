@@ -1,4 +1,5 @@
 import register
+import os
 
 def load_data(filepath):
     with open(filepath, 'r') as f:
@@ -7,10 +8,13 @@ def load_data(filepath):
 
 def rCycle():
     try:
+        if not os.path.exists("userdata/device_tokens.py"):
+            raise Exception
         with open("userdata/refresh_token", "r") as r:
             rt = r.read()
             return(rt)
     except:
+        register.create_and_save_attestation_keys()
         challengelinkstatic = register.challenge_link
         print(challengelinkstatic)
         maplanding_url = input('Enter result URL from doing Challenge Link:')

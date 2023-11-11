@@ -1,4 +1,8 @@
-import userdata.speed_behavior_values as time
+try:
+    import userdata.speed_behavior_values as time
+except:
+    print("Please set the Speeds and Behavior")
+    exit()
 
 start = time.starttime
 end = time.endtime
