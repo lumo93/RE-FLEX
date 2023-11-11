@@ -96,9 +96,12 @@ global_variables = {
 }
 
 def sign_request(private_key: ec.EllipticCurvePrivateKey, path: str):
-    key_id = register_attestation()
+    from key_id import key_id
+    if time.time() > key_id["expiration"] - 60:
+        register_attestation()
     nonce = str(round(time.time() * 1000))
-    signature_params = f'("@path" "x-amzn-marketplace-id" "user-agent");created={nonce};nonce="{nonce}";alg="ecdsa-p256-sha256";keyid="{key_id}"'
+    key = key_id["keyId"]
+    signature_params = f'("@path" "x-amzn-marketplace-id" "user-agent");created={nonce};nonce="{nonce}";alg="ecdsa-p256-sha256";keyid="{key}"'
     message_parts = [
       f"\"@path\": {path}",
       f"\"x-amzn-marketplace-id\": {MARKETPLACE}",
@@ -275,7 +278,16 @@ def accept_block(block):
         session=session,
         sign_request=True
     )
-
+    if accept.status_code == 420:
+        register_attestation()
+        sign_request(private_key, "/AcceptOffer")
+        accept = amz_request(
+            method="post", 
+            url="https://flex-capacity-na.amazon.com/AcceptOffer",
+            json=json_data.accept_json_data(block["offerId"]),
+            session=session,
+            sign_request=True
+        )
     if accept.status_code == 200:
         live_updates.live_mode(block)
         live_updates.print_history(block)
@@ -331,6 +343,16 @@ def validate_captcha(validationId: str) -> bool:
         session=session,
         sign_request=True
     )
+    if res.status_code == 420:
+        register_attestation()
+        sign_request(private_key, "/ValidateChallenge")
+        res = amz_request(
+            method="post",
+            url="https://flex-capacity-na.amazon.com/ValidateChallenge",
+            json=data,
+            session=session,
+            sign_request=True
+        )
     if res.status_code == 200:
         print("Captcha verified!")
         return True
@@ -356,12 +378,24 @@ def check_header_file():
             pass
     else:
         raise Exception('Token does not exist')
+    
+def load_key_id():
+    file_path = "userdata/key_id.py"
+    if not os.path.exists(file_path):
+        with open(file_path, "w") as f:
+            f.write(f'keyId=""\n')
+            f.write(f'expiration=0\n')
+    from userdata.key_id import keyId, expiration
+    from key_id import key_id
+    key_id["keyId"] = keyId
+    key_id["expiration"] = expiration
 
 if __name__ == "__main__":
 
     authCycle.authCycle()
     authCycle.instanceCycle()
     authCycle.areaIdCycle()
+    load_key_id()
     sign_request(private_key, "/AcceptOffer")
     keepItUp = True
     rejected_ids = set()

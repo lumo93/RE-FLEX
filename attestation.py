@@ -41,9 +41,9 @@ def attestation_header_refresh(headers: dict):
     headers['X-Amzn-RequestId'] = authCycle.requestIdSelfSingleUse()
     headers['X-Flex-Client-Time'] = str(round(time.time() * 1000))
 
-def register_attestation() -> str:
+def register_attestation():
     import userdata.device_tokens as device_tokens
-    
+    from key_id import key_id
     headers = header_data.headers.copy()
     attestation_header_refresh(headers)
     headers['X-Amzn-Identity-Auth-Domain'] = '.amazon.com'
@@ -70,6 +70,11 @@ def register_attestation() -> str:
             debug_info = response.text
         print(debug_info)
         exit()
-    response_json = response.json()
-    key_id: str = response_json.get('keyId')
-    return key_id
+    response_json = response.json() 
+    new_key_id: str = response_json.get('keyId')
+    expiration: int = response_json.get('expiration')
+    key_id["keyId"] = new_key_id
+    key_id["expiration"] = expiration
+    with open("userdata/key_id.py", "w") as f:
+        f.write(f'keyId="{new_key_id}"\n')
+        f.write(f'expiration={expiration}\n')
