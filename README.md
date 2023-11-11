@@ -21,7 +21,7 @@ Supported Python versions:
 You may or may not need to install 'pip' separately.
 
 Copy and paste the following command into terminal(Linux) or command prompt(Windows):
-`pip install requests pyaes pbkdf2 yagmail`
+`pip install requests pyaes pbkdf2 yagmail cryptography`
 
 
 ## Disclaimer

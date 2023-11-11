@@ -6,4 +6,5 @@ headers = {
     'User-Agent': 'useragent',
     'X-Amzn-RequestId': 'requestId',
     'Connection': 'Keep-Alive',
+    'x-amzn-marketplace-id': ''
 }

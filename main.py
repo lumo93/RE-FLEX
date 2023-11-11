@@ -3,10 +3,15 @@ from datetime import datetime, date
 import header_data
 import json_data
 import authCycle, getServiceAreas
-import os
+import os, base64
 from amz_request import amz_request
 from urllib.parse import urlparse, parse_qs
 from get_flex_version import get_flex_version
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import hashes
+from signature_headers import signature_headers
+
+MARKETPLACE = "ATVPDKIKX0DER"
 
 ver = get_flex_version()
 if not ver:
@@ -35,6 +40,7 @@ try:
     stationlist = load_data('userdata/serviceAreaIds')
 except:
     authCycle.authCycle()
+    authCycle.instanceCycle()
     getServiceAreas.getAllServiceAreas()
     stationlist = load_data('userdata/serviceAreaIds')
     
@@ -55,8 +61,9 @@ with open('userdata/chosen_station_list', 'r') as f:
 
 with open('userdata/useragent', 'r') as u:
     ua = u.read()
-
-header_data.headers['User-Agent'] = f"'{ua} RabbitAndroid/{ver}'"
+flex_user_agent = f"{ua} RabbitAndroid/{ver}"
+header_data.headers['User-Agent'] = flex_user_agent
+header_data.headers['x-amzn-marketplace-id'] = MARKETPLACE
 # update the value of serviceAreaFilter in search_json_data
 json_data.search_json_data["filters"]["serviceAreaFilter"] = keys
 
@@ -80,6 +87,35 @@ burstrefresh = burstvalue
 
 #In Minutes
 ratelimitsleep = sbv.ratelimitsleep
+
+from userdata.device_tokens import privateAttestationKey
+from attestation import load_attestation_private_key, register_attestation
+
+global_variables = { 
+ "signature_headers_last_signed": 0.0
+}
+
+def sign_request(private_key: ec.EllipticCurvePrivateKey, path: str):
+    key_id = register_attestation()
+    nonce = str(round(time.time() * 1000))
+    signature_params = f'("@path" "x-amzn-marketplace-id" "user-agent");created={nonce};nonce="{nonce}";alg="ecdsa-p256-sha256";keyid="{key_id}"'
+    message_parts = [
+      f"\"@path\": {path}",
+      f"\"x-amzn-marketplace-id\": {MARKETPLACE}",
+      f"\"user-agent\": {flex_user_agent}",
+      f"\"@signature-params\": {signature_params}"
+    ]
+    message = '\n'.join(message_parts)
+    signature = private_key.sign(message.encode('utf-8'), ec.ECDSA(hashes.SHA256()))
+    encoded_signature = base64.b64encode(signature).decode('utf-8')
+    sig_headers = {
+      "Signature-Input": f"x-amzn-attest={signature_params}",
+      "Signature": f"x-amzn-attest=:{encoded_signature}:"
+    } 
+    signature_headers.update(sig_headers)
+    global_variables["signature_headers_last_signed"] = time.time()
+
+private_key = load_attestation_private_key(privateAttestationKey)
 
 def rate_sleep_print():
     with open ("scandata/token-status", "a") as d:
@@ -236,7 +272,8 @@ def accept_block(block):
         method="post", 
         url="https://flex-capacity-na.amazon.com/AcceptOffer",
         json=json_data.accept_json_data(block["offerId"]),
-        session=session
+        session=session,
+        sign_request=True
     )
 
     if accept.status_code == 200:
@@ -272,17 +309,18 @@ def accept_block(block):
                 input_accepted = False
         validated = validate_captcha(validation_id)
         if not validated:
-            exit() #TODO
+            exit()
         
     else:
         live_updates.live_mode(block)
         live_updates.print_history(block)
         logging.info(f"Missed The Block For {block['rateInfo']['priceAmount']}")
         debug.missed_print(block)
-
+    sign_request(private_key, "/AcceptOffer")
     return accept.status_code
 
 def validate_captcha(validationId: str) -> bool:
+    sign_request(private_key, "/ValidateChallenge")
     data = {
         "challengeToken": f'{{"uniqueValidationId":"{validationId}"}}'
     }
@@ -290,7 +328,8 @@ def validate_captcha(validationId: str) -> bool:
         method="post",
         url="https://flex-capacity-na.amazon.com/ValidateChallenge",
         json=data,
-        session=session
+        session=session,
+        sign_request=True
     )
     if res.status_code == 200:
         print("Captcha verified!")
@@ -323,7 +362,7 @@ if __name__ == "__main__":
     authCycle.authCycle()
     authCycle.instanceCycle()
     authCycle.areaIdCycle()
-
+    sign_request(private_key, "/AcceptOffer")
     keepItUp = True
     rejected_ids = set()
     while keepItUp:
@@ -358,3 +397,6 @@ if __name__ == "__main__":
         if(burstrefresh==burstvalue):
             burstrefresh = 0
             time.sleep(random.uniform(timelow, timehigh))
+        
+        if global_variables["signature_headers_last_signed"] < time.time() - 300:
+            sign_request(private_key, "/AcceptOffer")

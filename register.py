@@ -17,8 +17,14 @@ import hmac
 import gzip
 import json
 
-with open('userdata/useragent', 'r') as u:
-    ua = u.read()
+from attestation import create_attestation_key, serialize_and_encode_keys
+
+try:
+    with open('userdata/useragent', 'r') as u:
+        ua = u.read()
+except:
+    print("Please set the user agent")
+    exit()
 
 APP_NAME = "com.amazon.rabbit"
 APP_VERSION = "303338310"
@@ -27,8 +33,7 @@ MANUFACTURER = "LeMobile"
 OS_VERSION = "LeEco/Le2_NA/le_s2_na:6.0.1/IFXNAOP5801910272S/61:user/release-keys"
 USER_AGENT = ua
 
-DEVICE_TYPE = "A1MPSLFC7L5AFK" # or any other device type
-"""You need to save the following 3 variables somewhere on init"""
+DEVICE_TYPE = "A1MPSLFC7L5AFK"
 device_serial = uuid.uuid4().hex.upper()
 device_id = secrets.token_hex(8)
 code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b'=').decode()
@@ -58,6 +63,15 @@ oauth_params = {
 }
 challenge_link = f"https://www.amazon.com/ap/signin?{urlencode(oauth_params)}"
 
+def create_and_save_attestation_keys():
+    private_key, public_key = create_attestation_key()
+    private_key_str, public_key_str = serialize_and_encode_keys(private_key, public_key)
+
+    with open("userdata/device_tokens.py", "w") as f:
+        f.write(f'privateAttestationKey="{private_key_str}"\n')
+        f.write(f'publicAttestationKey="{public_key_str}"\n')
+        f.write(f'deviceId="{device_id}"\n')
+        f.write(f'deviceSerial="{device_serial}"\n')
 
 def register_account(maplanding_url):
     parsed_query = parse_qs(urlparse(maplanding_url).query)
@@ -139,7 +153,7 @@ def register_account(maplanding_url):
         "access_token": x_amz_access_token,
         "refresh_token": refresh_token,
         "amz_account_id": amz_account_id
-        }
+    }
     #print(data)
     #with open('userdata/register_data', 'w') as d:
         #print(reg_access_token, '\n', amz_account_id, '\n', data, '\n', res, file=d)
@@ -176,7 +190,7 @@ def get_flex_auth_token(refresh_token: str) -> str:
         "requested_token_type": "access_token",
     }
     headers = {
-        "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; Pixel 2 Build/OPM1.171019.021)",
+        "User-Agent": USER_AGENT,
         "x-amzn-identity-auth-domain": "api.amazon.com",
     }
     res = requests.post(url, json=data, headers=headers)
@@ -189,20 +203,20 @@ def get_flex_auth_token(refresh_token: str) -> str:
                 print(f"Error refreshing token. Code 400, Message: {msg}")
         except:
             print(f"Error refreshing token. Code 400, Message: {res.text}")
-        exit() #TODO
+        exit()
     elif res.status_code != 200:
         print(f"Error refreshing token. Code {res.status_code}, Message: {res.text}")
-        exit() #TODO
+        exit()
     try:
         res_json = res.json()
         if 'access_token' in res_json:
             x_amz_access_token = res_json['access_token']
         else:
             print(f"Error refreshing token. Code {res.status_code}, Message: {res.text}")
-            exit() #TODO
-    except Exception as e:
+            exit()
+    except Exception:
         print(f"Error refreshing token. Code {res.status_code}, Message: {res.text}")
-        exit() #TODO
+        exit()
     return x_amz_access_token
 
 
