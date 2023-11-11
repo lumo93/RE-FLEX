@@ -97,7 +97,7 @@ global_variables = {
 
 def sign_request(private_key: ec.EllipticCurvePrivateKey, path: str):
     from key_id import key_id
-    if time.time() > key_id["expiration"] - 60:
+    if time.time() * 1000 > key_id["expiration"] - 60:
         register_attestation()
     nonce = str(round(time.time() * 1000))
     key = key_id["keyId"]
